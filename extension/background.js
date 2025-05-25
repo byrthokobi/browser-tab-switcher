@@ -1,28 +1,30 @@
-function connectNative() {
-  const port = browser.runtime.connectNative("tab_switcher_host");
+const port = browser.runtime.connectNative("tab_switcher_host");
 
-  port.onMessage.addListener((message) => {
-    console.log("Received message from native app:", message);
-    if (message.action === "switch-left") {
-      switchTab(-1);
-    } else if (message.action === "switch-right") {
-      switchTab(1);
-    }
-  });
+port.onMessage.addListener((message) => {
+  console.log("Received message:", message);
 
-  port.onDisconnect.addListener(() => {
-    console.error("Disconnected from native app");
-  });
-}
+  if (message.action === "switch-left" || message.action === "switch-right") {
+    browser.tabs.query({ currentWindow: true }).then((tabs) => {
+      browser.tabs.query({ active: true, currentWindow: true }).then((activeTabs) => {
+        const activeIndex = activeTabs[0].index;
+        const direction = message.action === "switch-left" ? -1 : 1;
+        let nextIndex = activeIndex + direction;
 
-function switchTab(direction) {
-  browser.tabs.query({ currentWindow: true }).then((tabs) => {
-    browser.tabs.query({ active: true, currentWindow: true }).then(([activeTab]) => {
-      const activeIndex = activeTab.index;
-      const newIndex = (activeIndex + direction + tabs.length) % tabs.length;
-      browser.tabs.update(tabs[newIndex].id, { active: true });
+        if (nextIndex < 0) {
+          nextIndex = tabs.length - 1;
+        } else if (nextIndex >= tabs.length) {
+          nextIndex = 0;
+        }
+
+        const nextTab = tabs.find(tab => tab.index === nextIndex);
+        if (nextTab) {
+          browser.tabs.update(nextTab.id, { active: true });
+        }
+      });
     });
-  });
-}
+  }
+});
 
-connectNative();
+port.onDisconnect.addListener(() => {
+  console.error("Disconnected from native app");
+});
