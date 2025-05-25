@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "Tab Switcher Extension",
+  "version": "1.0",
+  "description": "Switch tabs when mouse hits screen edges using native messaging.",
+  "permissions": [
+    "nativeMessaging",
+    "tabs"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "applications": {
+    "gecko": {
+      "id": "tabswitcher@example.com"
+    }
+  }
+}

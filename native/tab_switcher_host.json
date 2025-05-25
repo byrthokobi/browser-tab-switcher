@@ -1,0 +1,7 @@
+{
+  "name": "tab_switcher_host",
+  "description": "Tab switcher native messaging host",
+  "path": "D:\\TabsBrowserProject\native\\mouse_tracker.cpp",
+  "type": "stdio",
+  "allowed_extensions": [ "tabswitcher@example.com" ]
+}
